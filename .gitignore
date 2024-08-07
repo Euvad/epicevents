@@ -1,0 +1,122 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# PyInstaller
+#  Usually these files are written by a Python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Virtual environment
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+crm_env/  # Your specific virtual environment folder
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# Testing results
+.coverage
+.tox/
+.nox/
+.cache
+pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+htmlcov/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PyCharm
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# VSCode
+.vscode/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Eclipse
+.project
+.pydevproject
+
+# MySQL Workbench
+*.mwb
+
+# dotenv
+.env
+.env.test
+
+# Alembic
+# Ignore compiled Python files in versions directory
+alembic/versions/*.pyc
+alembic/versions/*.pyo
+# Optionally ignore SQLite files created by alembic tests
+alembic_test.sqlite
+alembic.ini 
+alembic/
+# Logs
+*.log
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Other
+*.bak
+*.swp
+*~
+*.orig
+*.rej
+
+# Database
+*.sqlite3
+*.db
+
+# Configurations
+config.yaml
+config.json
