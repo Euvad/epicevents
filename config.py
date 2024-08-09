@@ -6,7 +6,7 @@
 #    By: Vadim <euvad.public@proton.me>             +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/07 15:30:22 by Vadim             #+#    #+#              #
-#    Updated: 2024/08/08 18:12:55 by Vadim            ###   ########.fr        #
+#    Updated: 2024/08/09 15:08:56 by Vadim            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,6 +17,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # JWT configuration
+SENTRY_DSN = os.getenv("SENTRY_DSN")
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
 JWT_EXP_DELTA_SECONDS = int(os.getenv("JWT_EXP_DELTA_SECONDS", 3600))

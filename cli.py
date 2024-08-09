@@ -6,7 +6,7 @@
 #    By: Vadim <euvad.public@proton.me>             +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/07 21:30:19 by Vadim             #+#    #+#              #
-#    Updated: 2024/08/08 17:54:16 by Vadim            ###   ########.fr        #
+#    Updated: 2024/08/09 15:07:16 by Vadim            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,6 +20,10 @@ from database import Session
 from models.client import Client
 from models.contract import Contract
 from models.event import Event
+from sentry import call_sentry
+
+
+call_sentry()
 
 console = Console()
 
