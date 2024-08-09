@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from models.contract import Contract
 
+
 class ContractDAO:
     def __init__(self, session: Session):
         self.session = session
@@ -30,7 +31,9 @@ class ContractDAO:
 
     def get_contract_by_id(self, contract_id: int) -> Contract:
         """Retrieve a contract by its ID."""
-        contract = self.session.query(Contract).filter(Contract.id == contract_id).first()
+        contract = (
+            self.session.query(Contract).filter(Contract.id == contract_id).first()
+        )
         if not contract:
             raise Exception("Contract not found")
         return contract
@@ -62,5 +65,6 @@ class ContractDAO:
                 self.session.commit()
             except IntegrityError as e:
                 self.session.rollback()
-                raise Exception(f"Contract deletion failed: {e.orig.diag.message_detail}")
-
+                raise Exception(
+                    f"Contract deletion failed: {e.orig.diag.message_detail}"
+                )

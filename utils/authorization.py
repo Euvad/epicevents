@@ -10,6 +10,7 @@
 #                                                                              #
 # **************************************************************************** #
 
+
 def has_permission(user, permission):
-    role_permissions = user.role.permissions.split(',')
+    role_permissions = user.role.permissions.split(",")
     return permission in role_permissions

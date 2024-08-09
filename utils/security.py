@@ -14,9 +14,11 @@ from argon2 import PasswordHasher
 
 ph = PasswordHasher()
 
+
 def hash_password(password):
     """Hash a password for storing."""
     return ph.hash(password)
+
 
 def verify_password(stored_password, provided_password):
     """Verify a stored password against one provided by the user."""

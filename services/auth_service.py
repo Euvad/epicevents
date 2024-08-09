@@ -13,6 +13,7 @@
 from dao.user_dao import UserDAO
 from utils.jwt_utils import generate_jwt
 
+
 class AuthService:
     def __init__(self, user_dao: UserDAO):
         self.user_dao = user_dao

@@ -16,21 +16,25 @@ import re
 
 def validate_email(email):
     """Validate email address format."""
-    regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+    regex = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
     return re.match(regex, email)
+
 
 def validate_phone(phone):
     """Validate phone number format (simple version)."""
-    regex = r'^\d{10}$'  # Assumes 10-digit phone numbers
+    regex = r"^\d{10}$"  # Assumes 10-digit phone numbers
     return re.match(regex, phone)
+
 
 def validate_non_empty_string(value, field_name):
     if not value or not isinstance(value, str) or value.strip() == "":
         raise ValueError(f"{field_name} must be a non-empty string")
 
+
 def validate_positive_number(value, field_name):
     if value is None or not isinstance(value, (int, float)) or value <= 0:
         raise ValueError(f"{field_name} must be a positive number")
+
 
 def validate_date_string(date_str, field_name):
     try:

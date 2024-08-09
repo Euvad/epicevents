@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from models.event import Event
 
+
 class EventDAO:
     def __init__(self, session: Session):
         self.session = session

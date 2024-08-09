@@ -13,6 +13,7 @@
 from sqlalchemy.orm import Session
 from models.client import Client
 
+
 class ClientDAO:
     def __init__(self, session: Session):
         self.session = session

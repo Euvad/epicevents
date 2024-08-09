@@ -6,7 +6,7 @@
 #    By: Vadim <euvad.public@proton.me>             +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/07 15:30:22 by Vadim             #+#    #+#              #
-#    Updated: 2024/08/07 15:30:25 by Vadim            ###   ########.fr        #
+#    Updated: 2024/08/08 18:12:55 by Vadim            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,9 +17,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # JWT configuration
-JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
-JWT_ALGORITHM = os.getenv('JWT_ALGORITHM', 'HS256')
-JWT_EXP_DELTA_SECONDS = int(os.getenv('JWT_EXP_DELTA_SECONDS', 3600))
-
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
+JWT_EXP_DELTA_SECONDS = int(os.getenv("JWT_EXP_DELTA_SECONDS", 3600))
+TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL")
 # Database configuration
-DATABASE_URL = os.getenv('DATABASE_URL')
+DATABASE_URL = os.getenv("DATABASE_URL")

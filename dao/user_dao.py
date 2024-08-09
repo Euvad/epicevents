@@ -6,7 +6,7 @@
 #    By: Vadim <euvad.public@proton.me>             +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/07 15:23:50 by Vadim             #+#    #+#              #
-#    Updated: 2024/08/07 20:46:04 by Vadim            ###   ########.fr        #
+#    Updated: 2024/08/09 11:07:58 by Vadim            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from models.user import User
 from utils.security import hash_password, verify_password
+
 
 class UserDAO:
     def __init__(self, session: Session):
@@ -28,7 +29,7 @@ class UserDAO:
             email=email,
             password_hash=password_hash,
             department=department,
-            role_id=role_id
+            role_id=role_id,
         )
         try:
             self.session.add(user)
@@ -49,7 +50,15 @@ class UserDAO:
             return user
         return None
 
-    def update_user(self, user_id, name=None, email=None, password=None, department=None, role_id=None):
+    def update_user(
+        self,
+        user_id,
+        name=None,
+        email=None,
+        password=None,
+        department=None,
+        role_id=None,
+    ):
         """Update an existing user's information."""
         user = self.session.query(User).filter(User.id == user_id).first()
         if not user:
@@ -78,6 +87,6 @@ class UserDAO:
         user = self.session.query(User).filter(User.id == user_id).first()
         if not user:
             raise Exception("User not found")
-        
+
         self.session.delete(user)
         self.session.commit()
