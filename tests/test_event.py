@@ -31,6 +31,7 @@ from dao.event_dao import EventDAO
 from config import TEST_DATABASE_URL
 from datetime import date
 
+
 def generate_unique_email(base_name="user"):
     """Génère un email unique en utilisant un UUID."""
     unique_id = uuid.uuid4()

@@ -14,6 +14,7 @@ import jwt
 from datetime import datetime, timedelta
 from config import JWT_SECRET_KEY, JWT_ALGORITHM, JWT_EXP_DELTA_SECONDS
 
+
 def generate_jwt(user_id):
     """Generate a JSON Web Token for a user."""
     exp = datetime.utcnow() + timedelta(seconds=JWT_EXP_DELTA_SECONDS)

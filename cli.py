@@ -15,19 +15,23 @@ from sentry import call_sentry
 import services.auth_service
 import datetime
 import os
+
 # Gérer les permissions avec des décorateurs et autorisations
 call_sentry()
 
 console = Console()
 
+
 def init_db():
     """Initialize a new session."""
     return Session()
+
 
 @click.group()
 def cli():
     """CLI for CRM Application."""
     pass
+
 
 # CLIENT COMMANDS
 @cli.group()
@@ -35,9 +39,12 @@ def client():
     """Manage clients."""
     pass
 
+
 @cli.command("login")
 @click.option("--email", prompt="Email", help="Your login email")
-@click.option("--password", prompt="Password", hide_input=True, help="Your login password")
+@click.option(
+    "--password", prompt="Password", hide_input=True, help="Your login password"
+)
 def login(email, password):
     """Authenticate and store the token."""
     try:
@@ -46,13 +53,14 @@ def login(email, password):
     except Exception as e:
         console.print(f"[bold red]Error during login: {e}[/bold red]")
 
+
 @client.command("update")
-@auth_required(["SALES"])  
-@click.argument("client_id")
-@click.option("--name", help="New client name.")
-@click.option("--email", help="New client email.")
-@click.option("--phone", help="New client phone.")
-@click.option("--company", help="New client company.")
+@auth_required(["SALES"])
+@click.option("--client_id", prompt="client_id")
+@click.option("--name", help="New client name.", prompt="name")
+@click.option("--email", help="New client email.", prompt="email")
+@click.option("--phone", help="New client phone.", prompt="phone")
+@click.option("--company", help="New client company.", prompt="company")
 def update_client(user_id, client_id, name, email, phone, company):
     """Update a client (Only for SALES on their own clients)."""
     session = init_db()
@@ -61,18 +69,23 @@ def update_client(user_id, client_id, name, email, phone, company):
         client = client_dao.get_client_by_id(client_id)
 
         if client.commercial_contact != user_id:
-            console.print("[bold red]Unauthorized: You can only modify your own clients.[/bold red]")
+            console.print(
+                "[bold red]Unauthorized: You can only modify your own clients.[/bold red]"
+            )
             return
 
         client_dao.update_client(client_id, name, email, phone, company)
-        console.print(f"[bold green]Client {client_id} updated successfully![/bold green]")
+        console.print(
+            f"[bold green]Client {client_id} updated successfully![/bold green]"
+        )
     except Exception as e:
         console.print(f"[bold red]Error updating client: {e}[/bold red]")
     finally:
         session.close()
 
+
 @client.command("list")
-@auth_required(read_only=True)  
+@auth_required(read_only=True)
 def list_clients(user_id):
     """List all clients."""
     session = init_db()
@@ -96,9 +109,21 @@ def list_clients(user_id):
                 client.email,
                 client.phone,
                 client.company_name or "N/A",
-                str(client.commercial_contact) if client.commercial_contact else "N/A",  # Ajout ici
-                client.creation_date.strftime("%Y-%m-%d") if client.creation_date else "N/A",
-                client.last_contact_date.strftime("%Y-%m-%d") if client.last_contact_date else "N/A",
+                (
+                    str(client.commercial_contact)
+                    if client.commercial_contact
+                    else "N/A"
+                ),  # Ajout ici
+                (
+                    client.creation_date.strftime("%Y-%m-%d")
+                    if client.creation_date
+                    else "N/A"
+                ),
+                (
+                    client.last_contact_date.strftime("%Y-%m-%d")
+                    if client.last_contact_date
+                    else "N/A"
+                ),
             )
 
         console.print(table)
@@ -126,7 +151,9 @@ def add_client(user_id, name, email, phone, company):
     session = init_db()
     try:
         client_dao = ClientDAO(session)
-        client_dao.add_client_from_params(name, email, phone, company, commercial_contact=user_id)
+        client_dao.add_client_from_params(
+            name, email, phone, company, commercial_contact=user_id
+        )
         console.print(f"[bold green]Client {name} added successfully![/bold green]")
     except Exception as e:
         console.print(f"[bold red]Error adding client: {e}[/bold red]")
@@ -140,20 +167,31 @@ def contract():
     """Manage contracts."""
     pass
 
+
 @contract.command("list")
-@auth_required(["MANAGEMENT", "SALES"])  # Seuls les managers et commerciaux peuvent voir les contrats
-@click.option("--unsigned", is_flag=True, help="Afficher uniquement les contrats non signés")
-@click.option("--unpaid", is_flag=True, help="Afficher uniquement les contrats non payés")
+@auth_required(
+    ["MANAGEMENT", "SALES"]
+)  # Seuls les managers et commerciaux peuvent voir les contrats
+@click.option(
+    "--unsigned", is_flag=True, help="Afficher uniquement les contrats non signés"
+)
+@click.option(
+    "--unpaid", is_flag=True, help="Afficher uniquement les contrats non payés"
+)
 def list_contracts(user_id, unsigned, unpaid):
     """List contracts with optional filters."""
     session = init_db()
     try:
         contract_dao = ContractDAO(session)
-        
+
         if unsigned:
-            contracts = contract_dao.get_unsigned_contracts(user_id)  # Récupère les contrats non signés
+            contracts = contract_dao.get_unsigned_contracts(
+                user_id
+            )  # Récupère les contrats non signés
         elif unpaid:
-            contracts = contract_dao.get_unpaid_contracts(user_id)  # Récupère les contrats non payés
+            contracts = contract_dao.get_unpaid_contracts(
+                user_id
+            )  # Récupère les contrats non payés
         else:
             contracts = contract_dao.get_all_contracts()  # Récupère tous les contrats
 
@@ -179,8 +217,9 @@ def list_contracts(user_id, unsigned, unpaid):
     finally:
         session.close()
 
+
 @contract.command("update")
-@auth_required(["SALES"])  
+@auth_required(["SALES"])
 @click.argument("contract_id")
 @click.option("--total_amount", type=float, help="New total amount.")
 @click.option("--amount_remaining", type=float, help="New remaining amount.")
@@ -193,28 +232,53 @@ def update_contract(user_id, contract_id, total_amount, amount_remaining, signed
         contract = contract_dao.get_contract_by_id(contract_id)
 
         if contract.commercial_id != user_id:
-            console.print("[bold red]Unauthorized: You can only modify your own contracts.[/bold red]")
+            console.print(
+                "[bold red]Unauthorized: You can only modify your own contracts.[/bold red]"
+            )
             return
 
-        contract_dao.update_contract(contract_id, total_amount, amount_remaining, signed)
-        console.print(f"[bold green]Contract {contract_id} updated successfully![/bold green]")
+        contract_dao.update_contract(
+            contract_id, total_amount, amount_remaining, signed
+        )
+        console.print(
+            f"[bold green]Contract {contract_id} updated successfully![/bold green]"
+        )
     except Exception as e:
         console.print(f"[bold red]Error updating contract: {e}[/bold red]")
     finally:
         session.close()
 
+
 @contract.command("add")
-@auth_required(["MANAGEMENT", "SALES"])  # Seuls MANAGEMENT et SALES peuvent ajouter un contrat
-@click.option("--client_id", prompt="Client ID", help="The ID of the client associated with the contract.", type=int)
-@click.option("--total_amount", prompt="Total Amount", help="Total contract value.", type=float)
-@click.option("--amount_remaining", prompt="Amount Remaining", help="Amount still to be paid.", type=float)
-@click.option("--signed", prompt="Signed (yes/no)", help="Is the contract signed?", type=str)
+@auth_required(
+    ["MANAGEMENT", "SALES"]
+)  # Seuls MANAGEMENT et SALES peuvent ajouter un contrat
+@click.option(
+    "--client_id",
+    prompt="Client ID",
+    help="The ID of the client associated with the contract.",
+    type=int,
+)
+@click.option(
+    "--total_amount", prompt="Total Amount", help="Total contract value.", type=float
+)
+@click.option(
+    "--amount_remaining",
+    prompt="Amount Remaining",
+    help="Amount still to be paid.",
+    type=float,
+)
+@click.option(
+    "--signed", prompt="Signed (yes/no)", help="Is the contract signed?", type=str
+)
 def add_contract(user_id, client_id, total_amount, amount_remaining, signed):
     """Add a new contract for a client."""
     session = init_db()
     try:
         contract_dao = ContractDAO(session)
-        user_dao = UserDAO(session)  # ✅ Fix : Initialiser UserDAO avec une session active
+        user_dao = UserDAO(
+            session
+        )  # ✅ Fix : Initialiser UserDAO avec une session active
 
         # Validation de l'entrée "signed"
         signed = signed.lower() == "yes"
@@ -231,11 +295,13 @@ def add_contract(user_id, client_id, total_amount, amount_remaining, signed):
             commercial_id=commercial_id,  # ✅ Fix : Ajout du commercial_id
             total_amount=total_amount,
             amount_remaining=amount_remaining,
-            signed=signed
+            signed=signed,
         )
 
         contract_dao.add_contract(new_contract)
-        console.print(f"[bold green]Contract added successfully for client {client_id} by commercial {commercial_id}![/bold green]")
+        console.print(
+            f"[bold green]Contract added successfully for client {client_id} by commercial {commercial_id}![/bold green]"
+        )
     except Exception as e:
         console.print(f"[bold red]Error adding contract: {e}[/bold red]")
     finally:
@@ -248,16 +314,39 @@ def event():
     """Manage events."""
     pass
 
-@event.command("add")
-@click.option("--contract_id", prompt="Contract ID", help="The ID of the associated contract.")
-@click.option("--start_date", prompt="Start Date (YYYY-MM-DD)", help="The start date of the event.")
-@click.option("--end_date", prompt="End Date (YYYY-MM-DD)", help="The end date of the event.")
-@click.option("--support_contact", prompt="Support Contact", help="The name of the support contact.", default="")
-@click.option("--location", prompt="Location", help="The location of the event.", default="")
-@click.option("--attendees", prompt="Number of Attendees", help="The number of attendees.", type=int, default=0)
 
+@event.command("add")
+@click.option(
+    "--contract_id", prompt="Contract ID", help="The ID of the associated contract."
+)
+@click.option(
+    "--start_date",
+    prompt="Start Date (YYYY-MM-DD)",
+    help="The start date of the event.",
+)
+@click.option(
+    "--end_date", prompt="End Date (YYYY-MM-DD)", help="The end date of the event."
+)
+@click.option(
+    "--support_contact",
+    prompt="Support Contact",
+    help="The name of the support contact.",
+    default="",
+)
+@click.option(
+    "--location", prompt="Location", help="The location of the event.", default=""
+)
+@click.option(
+    "--attendees",
+    prompt="Number of Attendees",
+    help="The number of attendees.",
+    type=int,
+    default=0,
+)
 @auth_required(["SALES"])
-def add_event(user_id, contract_id, start_date, end_date, support_contact, location, attendees):
+def add_event(
+    user_id, contract_id, start_date, end_date, support_contact, location, attendees
+):
     """Add a new event."""
     session = init_db()
     try:
@@ -277,11 +366,15 @@ def add_event(user_id, contract_id, start_date, end_date, support_contact, locat
             attendees=attendees,
         )
         event_dao.add_event(event)
-        console.print(f"[bold green]Event added successfully for contract {contract_id}![/bold green]")
+        console.print(
+            f"[bold green]Event added successfully for contract {contract_id}![/bold green]"
+        )
     except Exception as e:
         console.print(f"[bold red]Error adding event: {e}[/bold red]")
     finally:
         session.close()
+
+
 @event.command("list")
 @auth_required(["MANAGEMENT", "SUPPORT"])  # Tous les rôles peuvent voir des événements
 def list_events(user_id):
@@ -289,15 +382,19 @@ def list_events(user_id):
     session = init_db()
     try:
         event_dao = EventDAO(session)
-        user_dao = UserDAO(session)  # ✅ Fix : Initialiser UserDAO avec une session active
-        
+        user_dao = UserDAO(
+            session
+        )  # ✅ Fix : Initialiser UserDAO avec une session active
+
         # Récupérer l'utilisateur pour vérifier son rôle
         user = user_dao.get_user_by_id(user_id)
-        
+
         if user.role == "SUPPORT":
             events = event_dao.get_events_for_support(user_id)  # Filtre pour SUPPORT
         else:
-            events = event_dao.get_all_events()  # Tous les événements pour MANAGEMENT & SALES
+            events = (
+                event_dao.get_all_events()
+            )  # Tous les événements pour MANAGEMENT & SALES
 
         table = Table(title="Events")
         table.add_column("ID", style="cyan")
@@ -325,22 +422,33 @@ def list_events(user_id):
     finally:
         session.close()
 
+
 @cli.group()
 def collaborator():
     """Manage events."""
     pass
 
+
 @collaborator.command("add")
 @auth_required(["MANAGEMENT"])
-@click.option("--employee_number", prompt="Employee Number", help="The employee number of the collaborator.", type=int)
+@click.option(
+    "--employee_number",
+    prompt="Employee Number",
+    help="The employee number of the collaborator.",
+    type=int,
+)
 @click.option("--name", prompt="Name", help="The name of the collaborator.")
 @click.option("--email", prompt="Email", help="The email of the collaborator.")
-@click.option("--password", prompt="Password", help="The password for the collaborator.")
+@click.option(
+    "--password", prompt="Password", help="The password for the collaborator."
+)
 @click.option("--role", prompt="Role", help="The role of the collaborator.")
 def add_collaborator(user_id, employee_number, name, email, password, role):
     """Add a new collaborator."""
-    if role not in ["MANAGEMENT","SUPPORT","SALES"]:
-        console.print("[bold red]Error: Role must be MANAGEMENT, SUPPORT or SALES.[/bold red]")
+    if role not in ["MANAGEMENT", "SUPPORT", "SALES"]:
+        console.print(
+            "[bold red]Error: Role must be MANAGEMENT, SUPPORT or SALES.[/bold red]"
+        )
         return
     session = init_db()
     try:
@@ -352,17 +460,22 @@ def add_collaborator(user_id, employee_number, name, email, password, role):
             password=password,
             role=role,
         )
-        console.print(f"[bold green]Collaborator {collaborator.name} added successfully![/bold green]")
+        console.print(
+            f"[bold green]Collaborator {collaborator.name} added successfully![/bold green]"
+        )
     except Exception as e:
         console.print(f"[bold red]Error adding collaborator: {e}[/bold red]")
     finally:
         session.close()
 
+
 @collaborator.command("update")
 @click.argument("collaborator_id")
 @click.option("--name", prompt="Name", help="The new name of the collaborator.")
 @click.option("--email", prompt="Email", help="The new email of the collaborator.")
-@click.option("--password", prompt="Password", help="The new password for the collaborator.")
+@click.option(
+    "--password", prompt="Password", help="The new password for the collaborator."
+)
 @click.option("--role", prompt="Role", help="The new role of the collaborator.")
 def update_collaborator(collaborator_id, name, email, password, role):
     """Update a collaborator's information."""
@@ -376,11 +489,15 @@ def update_collaborator(collaborator_id, name, email, password, role):
             password=password,
             role=role,
         )
-        console.print(f"[bold green]Collaborator {collaborator_id} updated successfully![/bold green]")
+        console.print(
+            f"[bold green]Collaborator {collaborator_id} updated successfully![/bold green]"
+        )
     except Exception as e:
         console.print(f"[bold red]Error updating collaborator: {e}[/bold red]")
     finally:
         session.close()
+
+
 @collaborator.command("delete")
 @click.argument("collaborator_id")
 def delete_collaborator(collaborator_id):
@@ -389,20 +506,25 @@ def delete_collaborator(collaborator_id):
     try:
         user_dao = UserDAO(session)
         user_dao.delete_user(user_id=collaborator_id)
-        console.print(f"[bold green]Collaborator {collaborator_id} deleted successfully![/bold green]")
+        console.print(
+            f"[bold green]Collaborator {collaborator_id} deleted successfully![/bold green]"
+        )
     except Exception as e:
         console.print(f"[bold red]Error deleting collaborator: {e}[/bold red]")
     finally:
         session.close()
-@collaborator.command("list")
 
+
+@collaborator.command("list")
 @auth_required(["MANAGEMENT"])
 def list_collaborators(user_id):
     """List all collaborators."""
     session = init_db()
     try:
         user_dao = UserDAO(session)
-        collaborators = user_dao.get_all_users()  # Using get_all_users method from the DAO
+        collaborators = (
+            user_dao.get_all_users()
+        )  # Using get_all_users method from the DAO
         table = Table(title="Collaborators")
         table.add_column("ID", style="cyan")
         table.add_column("Employee Number", style="magenta")
@@ -424,7 +546,6 @@ def list_collaborators(user_id):
         console.print(f"[bold red]Error listing collaborators: {e}[/bold red]")
     finally:
         session.close()
-
 
 
 if __name__ == "__main__":

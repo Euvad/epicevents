@@ -32,7 +32,7 @@ class EventDAO:
             return event
         except IntegrityError as e:
             self.session.rollback()
-            raise #Exception(f"Event creation failed: {e.orig.diag.message_detail}")
+            raise  # Exception(f"Event creation failed: {e.orig.diag.message_detail}")
         except Exception as e:
             self.session.rollback()
             raise Exception(f"Error adding event: {e}")
@@ -91,11 +91,17 @@ class EventDAO:
         except Exception as e:
             self.session.rollback()
             raise Exception(f"Error deleting event: {e}")
+
     def get_events_for_support(self, support_user_id):
         """Retrieve events assigned to a specific support user."""
         try:
-            return self.session.query(Event).filter(
-                Event.support_contact == support_user_id  # Filtrer par support affecté
-            ).all()
+            return (
+                self.session.query(Event)
+                .filter(
+                    Event.support_contact
+                    == support_user_id  # Filtrer par support affecté
+                )
+                .all()
+            )
         except Exception as e:
             raise Exception(f"Error retrieving events for support: {e}")

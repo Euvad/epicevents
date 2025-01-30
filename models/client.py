@@ -10,7 +10,7 @@
 #                                                                              #
 # **************************************************************************** #
 
-from sqlalchemy import Column, Integer, String, Date
+from sqlalchemy import Column, Integer, String, Date, ForeignKey
 from sqlalchemy.orm import relationship
 from .base import Base
 
@@ -22,10 +22,11 @@ class Client(Base):
     full_name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     phone = Column(String)
-    company_name = Column(String)#nullable
+    company_name = Column(String)  # nullable
     creation_date = Column(Date)
     last_contact_date = Column(Date)
-    commercial_contact = Column(String)#relier a un user commercant relationship
-
+    # commercial_contact = Column(String)#relier a un user commercant relationship
+    commercial_contact = Column(Integer, ForeignKey("users.id"), nullable=True)
     # Relationships
     contracts = relationship("Contract", back_populates="client")
+    commercial = relationship("User")

@@ -89,19 +89,31 @@ class ContractDAO:
     def get_unsigned_contracts(self, commercial_id):
         """Retrieve all unsigned contracts for a specific commercial."""
         try:
-            return self.session.query(Contract).filter(
-                Contract.signed == False,
-                Contract.client.has(commercial_contact=commercial_id)  # Filtrer par commercial
-            ).all()
+            return (
+                self.session.query(Contract)
+                .filter(
+                    Contract.signed == False,
+                    Contract.client.has(
+                        commercial_contact=commercial_id
+                    ),  # Filtrer par commercial
+                )
+                .all()
+            )
         except Exception as e:
             raise Exception(f"Error retrieving unsigned contracts: {e}")
 
     def get_unpaid_contracts(self, commercial_id):
         """Retrieve all unpaid contracts for a specific commercial."""
         try:
-            return self.session.query(Contract).filter(
-                Contract.amount_remaining > 0,
-                Contract.client.has(commercial_contact=commercial_id)  # Filtrer par commercial
-            ).all()
+            return (
+                self.session.query(Contract)
+                .filter(
+                    Contract.amount_remaining > 0,
+                    Contract.client.has(
+                        commercial_contact=commercial_id
+                    ),  # Filtrer par commercial
+                )
+                .all()
+            )
         except Exception as e:
             raise Exception(f"Error retrieving unpaid contracts: {e}")

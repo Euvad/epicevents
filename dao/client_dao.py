@@ -41,17 +41,17 @@ class ClientDAO:
         except Exception as e:
             raise Exception(f"Error retrieving all clients: {e}")
 
-    def update_client(self, client: Client):
+    def update_client(self, client_id, full_name, email, phone, company_name):
         """Update an existing client's information."""
         try:
-            existing_client = self.get_client_by_id(client.id)
+            existing_client = self.get_client_by_id(client_id)
             if not existing_client:
                 raise Exception("Client not found")
 
-            existing_client.full_name = client.full_name
-            existing_client.email = client.email
-            existing_client.phone = client.phone
-            existing_client.company_name = client.company_name
+            existing_client.full_name = full_name
+            existing_client.email = email
+            existing_client.phone = phone
+            existing_client.company_name = company_name
             self.session.commit()
         except Exception as e:
             self.session.rollback()
@@ -69,15 +69,18 @@ class ClientDAO:
         except Exception as e:
             self.session.rollback()
             raise Exception(f"Error deleting client: {e}")
-    def add_client_from_params(self, name: str, email: str, phone: str, company: str, commercial_contact: int):
+
+    def add_client_from_params(
+        self, name: str, email: str, phone: str, company: str, commercial_contact: int
+    ):
         """Add a client directly from parameters, including the assigned commercial."""
         try:
             client = Client(
                 full_name=name,
                 email=email,
                 phone=phone,
-                company_name=company, 
-                commercial_contact=commercial_contact  # On ajoute l'attribution automatique
+                company_name=company,
+                commercial_contact=commercial_contact,  # On ajoute l'attribution automatique
             )
             self.session.add(client)
             self.session.commit()

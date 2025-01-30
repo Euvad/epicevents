@@ -47,12 +47,14 @@ class UserDAO:
             return self.session.query(User).filter(User.email == email).first()
         except Exception as e:
             raise Exception(f"Error retrieving user by email: {e}")
+
     def get_user_by_id(self, id) -> User:
         """Retrieve a user by their id."""
         try:
             return self.session.query(User).filter(User.id == id).first()
         except Exception as e:
-            raise Exception(f"Error retrieving user by id: {e}")      
+            raise Exception(f"Error retrieving user by id: {e}")
+
     def authenticate_user(self, email, password) -> User:
         """Authenticate a user by verifying their password."""
         try:
@@ -107,6 +109,7 @@ class UserDAO:
         except Exception as e:
             self.session.rollback()
             raise Exception(f"Error deleting user: {e}")
+
     def get_all_users(self) -> list[User]:
         """Retrieve all users."""
         try:
