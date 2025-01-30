@@ -23,10 +23,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from models.base import Base
 from models.user import User
-from models.role import Role
 from dao.user_dao import UserDAO
-from dao.role_dao import RoleDAO
-from config import DATABASE_URL
+from config import TEST_DATABASE_URL
 
 
 def generate_unique_email(base_name="user"):
@@ -38,22 +36,13 @@ def generate_unique_email(base_name="user"):
 class TestUserDAO(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.engine = create_engine(DATABASE_URL)
+        cls.engine = create_engine(TEST_DATABASE_URL)
         Base.metadata.create_all(cls.engine)
         cls.Session = sessionmaker(bind=cls.engine)
 
     def setUp(self):
         self.session = self.Session()
         self.user_dao = UserDAO(self.session)
-        self.role_dao = RoleDAO(self.session)
-
-        # Ensure the role exists for the tests
-        self.test_role = self.role_dao.get_role_by_name("TestRole")
-        if not self.test_role:
-            self.test_role = self.role_dao.create_role(
-                name="TestRole", permissions="test_permission"
-            )
-
         # Clear users before each test
         self.session.query(User).delete()
         self.session.commit()
@@ -75,8 +64,7 @@ class TestUserDAO(unittest.TestCase):
             name="Alice",
             email=email,
             password="password123",
-            department="Sales",
-            role_id=self.test_role.id,
+            role="Sales",
         )
         result = self.user_dao.get_user_by_email(email)
         self.assertIsNotNone(result)
@@ -90,8 +78,7 @@ class TestUserDAO(unittest.TestCase):
             name="Bob",
             email=email,
             password="password456",
-            department="Management",
-            role_id=self.test_role.id,
+            role="Management",
         )
         user = self.user_dao.get_user_by_email(email)
         self.assertIsNotNone(user)
@@ -105,16 +92,15 @@ class TestUserDAO(unittest.TestCase):
             name="Charlie",
             email=email,
             password="password789",
-            department="IT",
-            role_id=self.test_role.id,
+            role="IT",
         )
         user.name = "Charlie Brown"
-        user.department = "Development"
+        user.role = "Development"
         updated_user = self.user_dao.update_user(
-            user.id, name=user.name, department=user.department
+            user.id, name=user.name, role=user.role
         )
         self.assertEqual(updated_user.name, "Charlie Brown")
-        self.assertEqual(updated_user.department, "Development")
+        self.assertEqual(updated_user.role, "Development")
 
     def test_delete_user(self):
         """Test deleting a user by their ID."""
@@ -124,8 +110,7 @@ class TestUserDAO(unittest.TestCase):
             name="Dave",
             email=email,
             password="password101112",
-            department="HR",
-            role_id=self.test_role.id,
+            role="HR",
         )
         self.user_dao.delete_user(user.id)
         result = self.user_dao.get_user_by_email(email)
@@ -139,8 +124,7 @@ class TestUserDAO(unittest.TestCase):
             name="Eve",
             email=email,
             password="password456",
-            department="Management",
-            role_id=self.test_role.id,
+            role="Management",
         )
         authenticated_user = self.user_dao.authenticate_user(
             email=email, password="password456"

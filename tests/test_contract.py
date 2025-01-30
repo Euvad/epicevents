@@ -27,7 +27,7 @@ from models.client import Client
 from models.contract import Contract
 from dao.client_dao import ClientDAO
 from dao.contract_dao import ContractDAO
-from config import DATABASE_URL
+from config import TEST_DATABASE_URL
 
 
 def generate_unique_email(base_name="user"):
@@ -40,7 +40,7 @@ class TestContractDAO(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Use the PostgreSQL test database URL
-        cls.engine = create_engine(DATABASE_URL)
+        cls.engine = create_engine(TEST_DATABASE_URL)
         Base.metadata.create_all(cls.engine)
         cls.Session = sessionmaker(bind=cls.engine)
 

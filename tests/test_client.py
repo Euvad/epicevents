@@ -26,7 +26,7 @@ from models.contract import Contract
 from models.event import Event
 from models.client import Client
 from dao.client_dao import ClientDAO
-from config import DATABASE_URL
+from config import TEST_DATABASE_URL
 
 
 def generate_unique_email(base_name="user"):
@@ -38,7 +38,7 @@ def generate_unique_email(base_name="user"):
 class TestClientDAO(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.engine = create_engine(DATABASE_URL)
+        cls.engine = create_engine(TEST_DATABASE_URL)
         Base.metadata.create_all(cls.engine)
         cls.Session = sessionmaker(bind=cls.engine)
 

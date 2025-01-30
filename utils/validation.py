@@ -10,34 +10,27 @@
 #                                                                              #
 # **************************************************************************** #
 
-from datetime import datetime
+from datetime import datetime,date
 import re
+from typing import Optional  # Use Optional for typing compatibility
+# Validation utility functions
+def validate_email(email: str) -> bool:
+    email_regex = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+$"
+    return re.match(email_regex, email) is not None
 
+def validate_phone(phone: str) -> bool:
+    """Validate phone number to be digits only and have a valid length."""
+    return phone.isdigit() and len(phone) >= 10
 
-def validate_email(email):
-    """Validate email address format."""
-    regex = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
-    return re.match(regex, email)
+def validate_amount(amount: float) -> bool:
+    """Ensure the amount is a positive number."""
+    return amount > 0
 
-
-def validate_phone(phone):
-    """Validate phone number format (simple version)."""
-    regex = r"^\d{10}$"  # Assumes 10-digit phone numbers
-    return re.match(regex, phone)
-
-
-def validate_non_empty_string(value, field_name):
-    if not value or not isinstance(value, str) or value.strip() == "":
-        raise ValueError(f"{field_name} must be a non-empty string")
-
-
-def validate_positive_number(value, field_name):
-    if value is None or not isinstance(value, (int, float)) or value <= 0:
-        raise ValueError(f"{field_name} must be a positive number")
-
-
-def validate_date_string(date_str, field_name):
+def validate_signed(signed: str) -> bool:
+    """Ensure the signed input is 'yes' or 'no'."""
+    return signed.lower() in ['yes', 'no']
+def parse_date(dt: str) -> Optional[date]:
     try:
-        datetime.strptime(date_str, "%Y-%m-%d")
+        return datetime.strptime(dt, "%Y-%m-%d").date()
     except ValueError:
-        raise ValueError(f"{field_name} must be a valid date in YYYY-MM-DD format")
+        return None
