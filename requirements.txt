@@ -1,0 +1,8 @@
+click
+rich
+sqlalchemy
+alembic
+argon2-cffi
+jwt
+python-dotenv
+sentry-sdk
