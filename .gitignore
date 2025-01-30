@@ -89,16 +89,6 @@ htmlcov/
 .env
 .env.test
 
-# Alembic
-# Ignore compiled Python files in versions directory
-alembic/versions/*.pyc
-alembic/versions/*.pyo
-# Optionally ignore SQLite files created by alembic tests
-alembic_test.sqlite
-alembic.ini 
-alembic/
-# Logs
-*.log
 
 # MacOS
 .DS_Store
