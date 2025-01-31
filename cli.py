@@ -220,10 +220,10 @@ def list_contracts(user_id, unsigned, unpaid):
 
 @contract.command("update")
 @auth_required(["SALES"])
-@click.argument("contract_id")
-@click.option("--total_amount", type=float, help="New total amount.")
-@click.option("--amount_remaining", type=float, help="New remaining amount.")
-@click.option("--signed", type=bool, help="Mark contract as signed (yes/no).")
+@click.option("--contract_id", prompt="contract_id")
+@click.option("--total_amount", type=float, help="New total amount.", prompt="total_amount")
+@click.option("--amount_remaining", type=float, help="New remaining amount.", prompt="amount_remaining")
+@click.option("--signed", type=bool, help="Mark contract as signed (yes/no).", prompt="signed")
 def update_contract(user_id, contract_id, total_amount, amount_remaining, signed):
     """Update a contract (Only for SALES on their own contracts)."""
     session = init_db()
@@ -247,6 +247,7 @@ def update_contract(user_id, contract_id, total_amount, amount_remaining, signed
         console.print(f"[bold red]Error updating contract: {e}[/bold red]")
     finally:
         session.close()
+
 
 
 @contract.command("add")
@@ -343,7 +344,7 @@ def event():
     type=int,
     default=0,
 )
-@auth_required(["SALES"])
+@auth_required(["SALES", "SUPPORT"])
 def add_event(
     user_id, contract_id, start_date, end_date, support_contact, location, attendees
 ):
@@ -374,6 +375,42 @@ def add_event(
     finally:
         session.close()
 
+@event.command("update")
+@auth_required(["SUPPORT"])  # Seuls les supports peuvent modifier leurs événements
+@click.argument("event_id", type=int)
+def update_event(user_id, event_id):
+    """Update an event (only for SUPPORT, only their assigned events)."""
+    session = init_db()
+    try:
+        event_dao = EventDAO(session)
+        event = event_dao.get_event_by_id(event_id)
+
+        if not event:
+            console.print("[bold red]Error: Event not found![/bold red]")
+            return
+        if int(event.support_contact) != int(user_id):
+            console.print("[bold red]Unauthorized: You can only modify your assigned events.[/bold red]")
+            return
+
+        # Demander les nouvelles valeurs à l'utilisateur
+        new_start_date = click.prompt("New Start Date (YYYY-MM-DD)", default=event.start_date.strftime("%Y-%m-%d"))
+        new_end_date = click.prompt("New End Date (YYYY-MM-DD)", default=event.end_date.strftime("%Y-%m-%d"))
+        new_location = click.prompt("New Location", default=event.location or "N/A")
+        new_attendees = click.prompt("New Number of Attendees", type=int, default=event.attendees)
+
+        # Conversion des dates
+        event.start_date = utils.validation.parse_date(new_start_date)
+        event.end_date = utils.validation.parse_date(new_end_date)
+        event.location = new_location
+        event.attendees = new_attendees
+
+        session.commit()
+        console.print(f"[bold green]Event {event_id} updated successfully![/bold green]")
+
+    except Exception as e:
+        console.print(f"[bold red]Error updating event: {e}[/bold red]")
+    finally:
+        session.close()
 
 @event.command("list")
 @auth_required(["MANAGEMENT", "SUPPORT"])  # Tous les rôles peuvent voir des événements
@@ -419,6 +456,27 @@ def list_events(user_id):
         console.print(table)
     except Exception as e:
         console.print(f"[bold red]Error listing events: {e}[/bold red]")
+    finally:
+        session.close()
+@event.command("delete")
+@auth_required(["MANAGEMENT"])  # Seuls les managers peuvent supprimer des événements
+@click.argument("event_id", type=int)
+def delete_event(user_id, event_id):
+    """Delete an event (only for MANAGEMENT)."""
+    session = init_db()
+    try:
+        event_dao = EventDAO(session)
+        event = event_dao.get_event_by_id(event_id)
+
+        if not event:
+            console.print("[bold red]Error: Event not found![/bold red]")
+            return
+
+        event_dao.delete_event(event_id)
+        console.print(f"[bold green]Event {event_id} deleted successfully![/bold green]")
+
+    except Exception as e:
+        console.print(f"[bold red]Error deleting event: {e}[/bold red]")
     finally:
         session.close()
 
